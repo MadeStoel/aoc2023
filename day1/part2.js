@@ -1,4 +1,5 @@
-import input from "./input.mjs";
+const fs = require("fs");
+const input = fs.readFileSync(__dirname + "/input.txt", "utf8").split("\n").filter(Boolean);
 
 const replacements = {
     'one': '1',

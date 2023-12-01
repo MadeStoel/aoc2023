@@ -1,4 +1,6 @@
-import input from "./input.mjs";
+const fs = require("fs");
+
+const input = fs.readFileSync(__dirname + "/input.txt", "utf8").split("\n").filter(Boolean);
 
 const answer = input.reduce((sum, line) => {
     const numbers = line.split("").filter(char => !isNaN(+char));
