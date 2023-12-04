@@ -25,4 +25,4 @@ input.forEach(row => {
 })
 
 // Add up all scores
-console.log(answer.reduce((total, score) => total += score, 0));
+console.log(answer.reduce((total, score) => total + score, 0));

@@ -30,10 +30,8 @@ input.forEach((row, index) => {
     }
 })
 
-console.log(amounts);
-
 // Add up all copies of all cards
-const answer = Object.values(amounts).reduce((total, cards) => total += cards, 0);
+const answer = Object.values(amounts).reduce((total, cards) => total + cards, 0);
 
 console.log(answer);
 
