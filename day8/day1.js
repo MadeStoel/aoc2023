@@ -1,24 +1,24 @@
 const fs = require("fs");
 
-const input = fs.readFileSync(__dirname + "/input.txt", "utf8").split("\n").filter(Boolean);
+const input = fs.readFileSync(__dirname + "/input.txt", "utf8").split("\r\n").filter(Boolean);
 
 const stepSequence = getStepSequence();
 const data = parseData();
 
-let currentKey = Object.keys(data)[0];
+let currentKey = 'AAA';
 let stepSequenceIndex = 0;
 let stepAmount = 0;
 
 while(currentKey !== 'ZZZ') {
-    console.log(stepAmount);
+    // Get the new key by using the left (0) or right(1) of the current step in the sequence
     currentKey = data[currentKey][stepSequence[stepSequenceIndex]];
 
     stepAmount++;
+    // Loop the step sequence if we reach the end
     stepSequenceIndex = stepSequenceIndex === stepSequence.length - 1 ? 0 : stepSequenceIndex + 1;
 }
 
-console.log(stepAmount);
-
+// Maps the values of a key to an array.
 function parseData() {
     const result = {};
 
@@ -33,6 +33,7 @@ function parseData() {
     return result;
 }
 
+// Converts the step sequence to 0 and 1 to use as array indexes.
 function getStepSequence() {
     const rawSequence = input[0];
 
