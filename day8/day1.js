@@ -18,6 +18,8 @@ while(currentKey !== 'ZZZ') {
     stepSequenceIndex = stepSequenceIndex === stepSequence.length - 1 ? 0 : stepSequenceIndex + 1;
 }
 
+console.log(stepAmount);
+
 // Maps the values of a key to an array.
 function parseData() {
     const result = {};
