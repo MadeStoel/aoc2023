@@ -10,8 +10,8 @@ let stepSequenceIndex = 0;
 let stepAmount = 0;
 
 let loopAmounts = [];
+let divisor = 2;
 
-// Get the lengths of all cycles for when a step sequences reaches a 'Z' ending key.
 currentKeys.forEach(currentKey => {
     while (currentKey.charAt(2) !== 'Z') {
         currentKey = data[currentKey][stepSequence[stepSequenceIndex]];
@@ -26,18 +26,19 @@ currentKeys.forEach(currentKey => {
     stepSequenceIndex = 0;
 });
 
-console.log(getLeastCommonMultiple(loopAmounts));
+while(loopAmounts.some(loopAmount => loopAmount % divisor !== 0)) {
+    divisor++;
+}
+
+console.log(loopAmounts.reduce((total, loopAmount) => getLeastCommonMultiple(total, loopAmount)));
 
 function getStartingKeys() {
     return Object.keys(data).filter(key => key.charAt(2) === 'A');
 }
 
-// Calculates the least common multiple of a range of numbers.
-function getLeastCommonMultiple(numbers) {
-    const greatestCommonDivisor = (x, y) => (!y ? x : greatestCommonDivisor(y, x % y));
-
-    const _lcm = (x, y) => (x * y) / greatestCommonDivisor(x, y);
-    return [...numbers].reduce((a, b) => _lcm(a, b));
+// Returns the least common multiple of 2 numbers
+function getLeastCommonMultiple(number1, number2) {
+    return (number1 * number2) / divisor;
 }
 
 // Maps the values of a key to an array.
