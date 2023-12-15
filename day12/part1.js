@@ -2,46 +2,38 @@ const fs = require("fs");
 
 let input = fs.readFileSync(__dirname + "/input.txt", "utf8").split("\r\n").filter(Boolean);
 
-let questionMarkIndexes;
-let data;
-let numbers;
-
-let answer = 0;
+let total = 0;
 
 input.forEach(row => {
-    [data, numbers] = row.split(' ');
+    let [data, numbers] = row.split(" ");
 
-    questionMarkIndexes = data.split('').reduce((result, char, index) => {
-        if (char === '?') result.push(index);
+    numbers = numbers.split(",").map(number => parseInt(number));
+    data    = `.${ data }.`;
 
-        return result;
-    }, []);
-
-    generateCombinations(data.split(''), 0);
+    isValid(data, numbers);
 });
 
-console.log(answer);
+console.log(total);
 
-function checkIfValid(data) {
-    let damagedSpringGroups = data.split('.').filter(Boolean);
-
-    damagedSpringGroups = damagedSpringGroups.map(group => group.length).join(',');
-
-    if (damagedSpringGroups === numbers) answer++;
-}
-
-
-function generateCombinations(row, index) {
-    if (index === questionMarkIndexes.length) {
-        checkIfValid(row.join(''));
+function isValid(data, numbers) {
+    if ( !numbers.length && !data.includes("#") ) {
+        total++;
         return;
     }
 
-    // Set the current index to 0 and generate combinations
-    row[questionMarkIndexes[index]] = '.';
-    generateCombinations([...row], index + 1);
+    const groupNumber = numbers[ 0 ];
+    const searchEnd   = data.length - 1 - groupNumber;
 
-    // Set the current index to 1 and generate combinations
-    row[questionMarkIndexes[index]] = '#';
-    generateCombinations([...row], index + 1);
+    for ( let i = 1; i <= searchEnd; i++ ) {
+        if ( fits(data, groupNumber, i) ) {
+            isValid(data.slice(i + groupNumber), numbers.slice(1));
+        }
+    }
 }
+
+function fits(data, groupNumber, index) {
+    if ( data.slice(0, index).includes("#") || data.charAt(index + groupNumber) === "#" ) return false;
+
+    return !data.slice(index, index + groupNumber).includes(".");
+}
+
