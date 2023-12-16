@@ -18,20 +18,16 @@ let beams = [
 
 while(!!beams.length) {
     advanceBeams();
-    console.log(beams);
-    console.log("==============");
 }
-
-console.log(visitedTiles.size)
+console.log(visitedTiles.size);
 
 function advanceBeams() {
     beams = beams.flatMap((beam, index) => {
         beam = updateHistory(beam);
-        const newBeams = processMirror(beam, input[beam.x][beam.y]);
+        const newBeams = processMirror(beam, input[beam.y][beam.x]);
 
         return newBeams.map(beam => {
             beam = moveBeam(beam);
-            visitedTiles.add(`${beam.x}-${beam.y}`);
             beam = filterBeam(beam);
 
             return beam;
@@ -65,6 +61,7 @@ function moveBeam(beam) {
 }
 
 function updateHistory(beam) {
+    visitedTiles.add(`${beam.x}-${beam.y}`);
     beam.history.push(`${beam.x}-${beam.y}_${beam.direction}`);
     return beam;
 }
