@@ -10,7 +10,6 @@ const answer = input.split(",").reduce((total, step) => {
 console.log(answer);
 
 function hashStep(step) {
-    console.log([step]);
     return Array(step.length - 1).fill(0).reduce((total, _, index) => {
         total += step.charCodeAt(index);
         total *= 17;
