@@ -7,96 +7,49 @@ let input = fs.readFileSync(__dirname + "/input.txt", "utf8").split("\n")
         .filter(Boolean)
     );
 
-const goalBlockKey = `${input[0].length - 1}-${input.length - 1}`;
-const maxX = input[0].length - 1;
-const maxY = input.length - 1;
-const checkedBlocks = [];
 
-const blocks = {
-    "0-0": {
-        heatLoss: 0,
-        fromBlock: null,
-        x: 0,
-        y: 0
+const blocks = [[0, 0, 0, 0, 0, 0]];
+const seen = {};
+
+while (!!blocks.length) {
+    const [heatLoss, row, column, rowDirection, columnDirection, steps] = blocks.shift();
+    if (seen[`${row}-${column}_${rowDirection}-${columnDirection}_${steps}`]) continue;
+
+    seen[`${row}-${column}_${rowDirection}-${columnDirection}_${steps}`] = true;
+
+    if (row === input.length - 1 && column === input[0].length - 1) {
+        console.log(heatLoss);
+        break;
     }
-};
 
-while (!checkedBlocks.includes(goalBlockKey)) {
-    const lowestBlock = getLowestHeatLossBlock();
+    if (steps < 3 && (rowDirection !== 0 || columnDirection !== 0)) {
+        const nextRow = row + rowDirection;
+        const nextColumn = column + columnDirection;
 
-    const availableDirections = ['north',
-        'east',
-        'south',
-        'west'];
+        // out of bounds check
+        if (nextRow >= 0 && nextRow < input.length && nextColumn >= 0 && nextColumn < input[0].length) {
+            const index = blocks.findIndex(block => block[0] > heatLoss + input[nextRow][nextColumn]);
+            const newBlock = [heatLoss + input[nextRow][nextColumn], nextRow, nextColumn, rowDirection, columnDirection, steps + 1];
 
-    availableDirections.forEach(direction => {
-        step(lowestBlock, direction);
-    });
-
-    checkedBlocks.push(`${lowestBlock.x}-${lowestBlock.y}`);
-}
-
-// ===============DEBUGGING=====================
-let blockToDraw = blocks[goalBlockKey]
-
-while (blockToDraw.heatLoss !== 0) {
-    input[blockToDraw.y][blockToDraw.x] = '#';
-
-    blockToDraw = blocks[blockToDraw.fromBlock];
-}
-
-input.forEach(row => {
-    console.log(row.join(''));
-});
-
-// ===============DEBUGGING=====================
-
-console.log(blocks[goalBlockKey].heatLoss);
-
-function getNextBlockCoords(block, direction) {
-    switch (direction) {
-        case 'north':
-            return [block.x, block.y - 1];
-        case 'east':
-            return [block.x + 1, block.y];
-        case 'south':
-            return [block.x, block.y + 1];
-        case 'west':
-            return [block.x - 1, block.y];
+            index !== -1 ? blocks.splice(index, 0, newBlock) : blocks.push(newBlock);
+        }
     }
-}
 
-function step(lowestBlock, direction) {
-    const nextBlockCoords = getNextBlockCoords(lowestBlock, direction);
+    const availableDirections = [[1, 0], [0, 1], [-1, 0], [0, -1]].filter(([nextRowDirection, nextColumnDirection]) => {
+        return (rowDirection !== nextRowDirection || columnDirection !== nextColumnDirection) &&
+            (rowDirection !== -nextRowDirection || columnDirection !== -nextColumnDirection);
+    })
 
-    if (nextBlockCoords[0] < 0 || nextBlockCoords[0] > maxX ||
-        nextBlockCoords[1] < 0 || nextBlockCoords[1] > maxY) return;
+    for (const [nextRowDirection, nextColumnDirection] of availableDirections) {
+        const nextRow = row + nextRowDirection;
+        const nextColumn = column + nextColumnDirection;
 
-    const lowestBlockKey = `${lowestBlock.x}-${lowestBlock.y}`;
-    const nextBlockKey = `${nextBlockCoords[0]}-${nextBlockCoords[1]}`;
-    const nextBlockNewHeatLoss = lowestBlock.heatLoss + input[nextBlockCoords[1]][nextBlockCoords[0]];
-    const nextBlock = blocks[nextBlockKey];
+        // out of bounds check
+        if (nextRow >= 0 && nextRow < input.length && nextColumn >= 0 && nextColumn < input[0].length) {
+            const index = blocks.findIndex(block => block[0] > heatLoss + input[nextRow][nextColumn]);
+            const newBlock = [heatLoss + input[nextRow][nextColumn], nextRow, nextColumn, nextRowDirection, nextColumnDirection, 1];
 
-    if (!nextBlock) {
-        blocks[nextBlockKey] = {
-            heatLoss: nextBlockNewHeatLoss,
-            fromBlock: lowestBlockKey,
-            x: nextBlockCoords[0],
-            y: nextBlockCoords[1]
-        };
-    } else if (nextBlock.heatLoss > nextBlockNewHeatLoss) {
-        nextBlock.heatLoss = nextBlockNewHeatLoss;
-        nextBlock.fromBlock = lowestBlockKey;
+            index !== -1 ? blocks.splice(index, 0, newBlock) : blocks.push(newBlock);
+        }
     }
-}
-
-function getLowestHeatLossBlock() {
-    return Object.values(blocks).filter(block => !checkedBlocks.includes(`${block.x}-${block.y}`))
-        .reduce((resultBlock, currentBlock) => {
-            if (resultBlock.heatLoss > currentBlock.heatLoss) {
-                return currentBlock;
-            }
-
-            return resultBlock;
-        });
 }
